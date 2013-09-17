@@ -1,4 +1,8 @@
 *.py[cod]
+comps*.xml
+*.env
+cache
+upstream
 
 # C extensions
 *.so
