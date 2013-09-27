@@ -60,7 +60,7 @@ Installation
 ::
 
   sudo yum install python-celery python-requests koji \
-        python-urlgrabber python-setuptools -y
+        python-urlgrabber python-setuptools python-billiard -y
 
 ::
    
