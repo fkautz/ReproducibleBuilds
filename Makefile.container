@@ -1,0 +1,32 @@
+term:
+	/bin/bash
+
+redis.service:
+	redis-server &
+	touch redis.service
+
+celery.service: redis.service
+	C_FORCE_ROOT=true celery -A tasks worker -b 'redis://localhost:6379' --autoscale=10,0&
+	sleep 5
+	touch celery.service
+
+download:
+	dnf download ${PACKAGE}
+	dnf download --source ${PACKAGE}
+	touch download
+
+mock.env: celery.service
+	python get-mock-info.py ${PACKAGE}
+	touch mock.env
+
+cache.cfg: mock.env
+	./makerepo.sh ${PACKAGE}.env cache
+
+build-rpm: cache.cfg download
+	/usr/bin/mock -r cache.cfg --configdir=. --rebuild ${PACKAGE}.src.rpm
+
+copy-results:
+	cp /var/lib/mock/cache/result/* /code/results
+
+compare:
+	./rpm-compare ${PACKAGE}.x86_64.rpm results/${PACKAGE}.x86_64.rpm > results/${PACKAGE}.x86_64.txt
