@@ -35,7 +35,7 @@ def download_urls(urls):
 
         try:
             prog_meter = urlgrabber.progress.TextMeter()
-            urlgrabber.grabber.urlgrab(url, path, progress_obj=prog_meter)
+            urlgrabber.grabber.urlgrab(url, path, progress_obj=prog_meter, proxies={ 'http' : 'http://localhost:3128', 'https' : 'http://localhost:3128'  })
         except:
             print "XXX ;("
 

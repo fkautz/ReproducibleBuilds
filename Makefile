@@ -3,11 +3,11 @@ default: build
 build:
 	docker build -t repro .
 
-run:  build
-	docker run --privileged -v `pwd`/results:/code/results repro make PACKAGE="${PACKAGE}" build-rpm copy-results compare
+run: build
+	docker run --privileged -v `pwd`/results:/code/results -v squid:/var/spool/squid repro make PACKAGE="${PACKAGE}" build-rpm copy-results compare
 
 term: build
-	docker run --privileged -i -t -v cache:/code/cache -v `pwd`/results:/code/results repro /bin/bash
+	docker run --privileged -i -t -v cache:/code/cache -v `pwd`/results:/code/results -v squid:/var/spool/squid repro /bin/bash
 
 clean:
 	rm -rf results/*

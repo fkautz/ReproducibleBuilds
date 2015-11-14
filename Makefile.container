@@ -6,23 +6,30 @@ redis.service:
 	touch redis.service
 
 celery.service: redis.service
-	C_FORCE_ROOT=true celery -A tasks worker -b 'redis://localhost:6379' --autoscale=10,0&
+	HTTP_PROXY="http://localhost:3128" C_FORCE_ROOT=true celery -A tasks worker -b 'redis://localhost:6379' --autoscale=10,0&
 	sleep 5
 	touch celery.service
 
-download:
+squid.service:
+	chown -R squid /var/spool/squid
+	squid -z
+	chown -R squid /var/spool/squid
+	squid
+	touch squid.service
+
+download: squid.service
 	dnf download ${PACKAGE}
 	dnf download --source ${PACKAGE}
 	touch download
 
-mock.env: celery.service
-	python get-mock-info.py ${PACKAGE}
+mock.env: celery.service squid.service
+	HTTP_PROXY="http://localhost:3128" python get-mock-info.py ${PACKAGE}
 	touch mock.env
 
-cache.cfg: mock.env
+cache.cfg: mock.env squid.service
 	./makerepo.sh ${PACKAGE}.env cache
 
-build-rpm: cache.cfg download
+build-rpm: cache.cfg download squid.service
 	/usr/bin/mock -r cache.cfg --configdir=. --rebuild ${PACKAGE}.src.rpm
 
 copy-results:
