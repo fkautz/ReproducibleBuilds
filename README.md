@@ -18,8 +18,8 @@ users at all.
 
 Requires
 ========
-docker
-make
+* docker
+* make
 
 Usage
 =====
