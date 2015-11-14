@@ -16,6 +16,42 @@ we ship?
 We (the distribution provider) shouldn't be forced to say "Trust Us" to our
 users at all.
 
+Requires
+========
+docker
+make
+
+Usage
+=====
+
+This is a modified version of kholia's work on reproducing binary packages in
+Fedora.
+
+```sh
+make PACKAGE="cpio-2.11-36.fc23" run
+```
+
+This will build a docker image for reproducing build, build a custom rpm repo,
+rebuild the environment using mock, and recompile.
+
+For now, please only run one compile at a time per system. Packages are cached
+with squid using a shared volume. Running multiple squid volumes may result in
+corruption. This is to prevent overloading fedora upstream and koji while
+building multiple packages.
+
+RPMs and a .txt report are stored in `./results` directory.
+
+For developers testing why a pakage has failed, use
+
+```sh
+make term
+```
+
+This will place the user in a docker image that can be used to manually run
+commands.
+
+Please review the Makefile for order of operations if you are manually
+debugging a build.
 
 Steps Involved
 ==============
